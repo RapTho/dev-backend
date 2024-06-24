@@ -3,13 +3,16 @@ package com.example.model;
 
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 
 @Entity
-public class AppUser {
+@Table(name = "users")
+public class User extends PanacheEntityBase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Schema(hidden = true) // Hide the 'id' field in Swagger UI
@@ -17,6 +20,11 @@ public class AppUser {
 
     private String name;
     private String email;
+
+    // Required for all JPA entities:
+    // https://openjpa.apache.org/builds/1.2.3/apache-openjpa/docs/jpa_overview_pc.html#jpa_overview_pc_no_arg
+    public User() {
+    }
 
     public Long getId() {
         return id;

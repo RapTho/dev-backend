@@ -1,8 +1,8 @@
 // src/main/java/com/example/controller/UserController.java
 package com.example.controller;
 
-import com.example.model.AppUser;
-import com.example.service.AppUserService;
+import com.example.model.User;
+import com.example.service.UserService;
 
 import jakarta.ws.rs.*;
 import jakarta.inject.Inject;
@@ -13,32 +13,32 @@ import java.util.List;
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
-public class AppUserController {
+public class UserController {
 
     @Inject
-    AppUserService userService;
+    UserService userService;
 
     @GET
-    public List<AppUser> getAllUsers() {
+    public List<User> getAllUsers() {
         return userService.listAllUsers();
     }
 
     @GET
     @Path("/{id}")
-    public AppUser getUserById(@PathParam("id") Long id) {
+    public User getUserById(@PathParam("id") Long id) {
         return userService.findUserById(id);
     }
 
     @POST
-    public Response createUser(AppUser user) {
-        AppUser createdUser = userService.createUser(user);
+    public Response createUser(User user) {
+        User createdUser = userService.createUser(user);
         return Response.status(Response.Status.CREATED).entity(createdUser).build();
     }
 
     @PUT
     @Path("/{id}")
-    public Response updateUser(@PathParam("id") Long id, AppUser user) {
-        AppUser updatedUser = userService.updateUser(id, user);
+    public Response updateUser(@PathParam("id") Long id, User user) {
+        User updatedUser = userService.updateUser(id, user);
         if (updatedUser != null) {
             return Response.ok(updatedUser).build();
         } else {
