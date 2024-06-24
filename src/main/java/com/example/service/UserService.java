@@ -33,19 +33,13 @@ public class UserService {
     public User updateUser(Long id, User updatedUser) {
 
         User user = userRepository.findById(id);
+
         if (user != null) {
             user.setName(updatedUser.getName());
             user.setEmail(updatedUser.getEmail());
             userRepository.persist(user);
         }
         return user;
-
-        // if (existingUser != null) {
-        // existingUser.setName(user.getName());
-        // existingUser.setEmail(user.getEmail());
-        // return existingUser;
-        // }
-        // return null;
     }
 
     @Transactional
