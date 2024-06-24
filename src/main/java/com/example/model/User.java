@@ -20,6 +20,7 @@ public class User extends PanacheEntityBase {
 
     private String name;
     private String email;
+    private int age;
 
     // Required for all JPA entities:
     // https://openjpa.apache.org/builds/1.2.3/apache-openjpa/docs/jpa_overview_pc.html#jpa_overview_pc_no_arg
@@ -48,5 +49,13 @@ public class User extends PanacheEntityBase {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
     }
 }

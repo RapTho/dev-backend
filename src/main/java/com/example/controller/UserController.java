@@ -19,8 +19,11 @@ public class UserController {
     UserService userService;
 
     @GET
-    public List<User> getAllUsers() {
-        return userService.listAllUsers();
+    public List<User> getAllUsers(
+            @QueryParam("page") @DefaultValue("0") int page,
+            @QueryParam("size") @DefaultValue("50") int size,
+            @QueryParam("sort") @DefaultValue("id") String sortKey) {
+        return userService.getAllUsers(page, size, sortKey);
     }
 
     @GET
