@@ -10,6 +10,8 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import java.util.List;
 
+import io.smallrye.mutiny.Uni;;
+
 @Path("/users")
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
@@ -19,7 +21,7 @@ public class UserController {
     UserService userService;
 
     @GET
-    public List<User> getAllUsers(
+    public Uni<List<User>> getAllUsers(
             @QueryParam("page") @DefaultValue("0") int page,
             @QueryParam("size") @DefaultValue("50") int size,
             @QueryParam("sort") @DefaultValue("id") String sortKey) {
@@ -28,35 +30,35 @@ public class UserController {
 
     @GET
     @Path("/{id}")
-    public User getUserById(@PathParam("id") Long id) {
+    public Uni<User> getUserById(@PathParam("id") Long id) {
         return userService.findUserById(id);
     }
 
     @POST
-    public Response createUser(User user) {
-        User createdUser = userService.createUser(user);
-        return Response.status(Response.Status.CREATED).entity(createdUser).build();
+    public Uni<Response> createUser(User user) {
+        return userService.createUser(user)
+                .onItem()
+                .transform(createdUser -> Response.status(Response.Status.CREATED).entity(createdUser).build());
     }
 
     @PUT
     @Path("/{id}")
-    public Response updateUser(@PathParam("id") Long id, User user) {
-        User updatedUser = userService.updateUser(id, user);
-        if (updatedUser != null) {
-            return Response.ok(updatedUser).build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+    public Uni<Response> updateUser(@PathParam("id") Long id, User user) {
+        return userService.updateUser(id, user)
+                .onItem().ifNotNull().transform(updatedUser -> Response.ok(updatedUser).build())
+                .onItem().ifNull().continueWith(() -> Response.status(Response.Status.NOT_FOUND).build());
     }
 
     @DELETE
     @Path("/{id}")
-    public Response deleteUser(@PathParam("id") Long id) {
-        boolean deleted = userService.deleteUser(id);
-        if (deleted) {
-            return Response.noContent().build();
-        } else {
-            return Response.status(Response.Status.NOT_FOUND).build();
-        }
+    public Uni<Response> deleteUser(@PathParam("id") Long id) {
+        return userService.deleteUser(id)
+                .onItem().transform(deleted -> {
+                    if (deleted) {
+                        return Response.status(Response.Status.OK).build();
+                    } else {
+                        return Response.status(Response.Status.NOT_FOUND).build();
+                    }
+                });
     }
 }

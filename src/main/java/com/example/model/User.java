@@ -3,7 +3,7 @@ package com.example.model;
 
 import org.eclipse.microprofile.openapi.annotations.media.Schema;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import io.quarkus.hibernate.reactive.panache.PanacheEntityBase;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.GeneratedValue;
