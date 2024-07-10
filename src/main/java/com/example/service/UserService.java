@@ -6,9 +6,11 @@ import com.example.repository.UserRepository;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import jakarta.transaction.Transactional;
 import java.util.List;
 import io.quarkus.panache.common.Sort;
+import io.quarkus.hibernate.reactive.panache.common.WithTransaction;
+import io.quarkus.hibernate.reactive.panache.common.WithSession;
+import io.smallrye.mutiny.Uni;
 
 @ApplicationScoped
 public class UserService {
@@ -16,38 +18,40 @@ public class UserService {
     @Inject
     UserRepository userRepository;
 
-    public List<User> getAllUsers(int page, int size, String sortKey) {
+    @WithSession
+    public Uni<List<User>> getAllUsers(int page, int size, String sortKey) {
         return userRepository.findAll(Sort.by(sortKey))
                 .page(page, size)
                 .list();
     }
 
-    public User findUserById(Long id) {
+    @WithSession
+
+    public Uni<User> findUserById(Long id) {
         return userRepository.findById(id);
     }
 
-    @Transactional
-    public User createUser(User user) {
-        userRepository.persist(user);
-        return user;
+    @WithTransaction
+    public Uni<User> createUser(User user) {
+        return userRepository.persist(user);
     }
 
-    @Transactional
-    public User updateUser(Long id, User updatedUser) {
+    @WithTransaction
+    public Uni<User> updateUser(Long id, User updatedUser) {
 
-        User user = userRepository.findById(id);
-
-        if (user != null) {
-            user.setName(updatedUser.getName());
-            user.setEmail(updatedUser.getEmail());
-            user.setAge(updatedUser.getAge());
-            userRepository.persist(user);
-        }
-        return user;
+        return userRepository.findById(id)
+                .onItem().ifNotNull().transformToUni(user -> {
+                    user.setName(updatedUser.getName());
+                    user.setEmail(updatedUser.getEmail());
+                    user.setAge(updatedUser.getAge());
+                    return userRepository.persist(user)
+                            .replaceWith(user);
+                })
+                .onItem().ifNull().continueWith(() -> null);
     }
 
-    @Transactional
-    public boolean deleteUser(Long id) {
+    @WithTransaction
+    public Uni<Boolean> deleteUser(Long id) {
         return userRepository.deleteById(id);
     }
 }
