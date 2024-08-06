@@ -1,3 +1,4 @@
+CREATE TABLE users (name varchar(255), email varchar(255), age varchar(255));
 INSERT INTO users (name, email, age) VALUES ('Raphael Nerd', 'raphael.nerd@example.com', 25);
 INSERT INTO users (name, email, age) VALUES ('Wannabe JavaDev', 'wannabe.javadev@example.com', 40);
 INSERT INTO users (name, email, age) VALUES ('Alice Wonderland', 'alice.wonderland@example.com', 30);
